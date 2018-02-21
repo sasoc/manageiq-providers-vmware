@@ -101,4 +101,26 @@ describe ManageIQ::Providers::Vmware::CloudManager do
   it "#supported_catalog_types" do
     expect(@ems.supported_catalog_types).to eq(%w(vmware))
   end
+
+  describe 'snapshot operations' do
+
+    context ".vm_create_snapshot" do
+      let(:the_new_snapshot) { double }
+      let(:snapshot_options) { {:name => 'name', :memory => false, :quiesce => false} }
+      let(:vm) { FactoryGirl.create(:vm_vmware, :ext_management_system => @ems) }
+      let(:ems) { FactoryGirl.create(:ems_vmware) }
+      let(:connection) { double("connection", :post_create_snapshot => "post_create_snapshot") }
+      let(:provider_object) { double("provider_object") }
+
+
+      it 'creates a snapshot' do
+        allow(vm).to receive(:with_provider_object).and_yield(provider_object)
+        expect(ems).to receive(:with_provider_connection).and_yield(connection)
+
+        expect(connection).to receive(:post_create_snapshot)
+        ems.vm_create_snapshot(vm, snapshot_options)
+      end
+    end
+
+  end
 end

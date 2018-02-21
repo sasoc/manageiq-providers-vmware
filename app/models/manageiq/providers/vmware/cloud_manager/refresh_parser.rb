@@ -134,6 +134,21 @@ class ManageIQ::Providers::Vmware::CloudManager::RefreshParser < ManageIQ::Provi
       }
     end
 
+    snapshot_resp = vm.service.get_snapshot_section(vm.id).data[:body][:Snapshot]
+
+    unless snapshot_resp.nil?
+      snapshot = [
+        {
+          :name        => "#{vm.name}(snapshot)",
+          :uid         => "#{vm.id}-#{snapshot_resp[:created]}",
+          :ems_ref     => "#{vm.id}-#{snapshot_resp[:created]}",
+          :parent_id   => vm.id,
+          :parent_uid  => vm.id,
+          :create_time => snapshot_resp[:created]
+        }
+      ]
+    end
+
     new_result = {
       :type                => ManageIQ::Providers::Vmware::CloudManager::Vm.name,
       :uid_ems             => uid,
@@ -141,6 +156,7 @@ class ManageIQ::Providers::Vmware::CloudManager::RefreshParser < ManageIQ::Provi
       :name                => name,
       :vendor              => "vmware",
       :raw_power_state     => status,
+      :snapshots           => snapshot,
 
       :hardware            => {
         :guest_os             => guest_os,

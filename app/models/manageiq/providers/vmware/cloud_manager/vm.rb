@@ -22,4 +22,6 @@ class ManageIQ::Providers::Vmware::CloudManager::Vm < ManageIQ::Providers::Cloud
   def self.display_name(number = 1)
     n_('Instance (VMware vCloud)', 'Instances (VMware vCloud)', number)
   end
+
+  supports :snapshots
 end

@@ -84,4 +84,21 @@ class ManageIQ::Providers::Vmware::CloudManager < ManageIQ::Providers::CloudMana
   def self.display_name(number = 1)
     n_('Cloud Provider (VMware vCloud)', 'Cloud Providers (VMware vCloud)', number)
   end
+
+  def vm_create_snapshot(vm, options = {})
+    options[:quiesce] = 'false'
+    with_provider_connection do |service|
+      service.post_create_snapshot(vm.uid_ems, options)
+    end
+  end
+
+  def vm_remove_snapshot(vm, options = {})
+    vm_remove_all_snapshots(vm, options)
+  end
+
+  def vm_remove_all_snapshots(vm, options = {})
+    with_provider_connection do |service|
+      service.post_remove_all_snapshots(vm.uid_ems)
+    end
+  end
 end
